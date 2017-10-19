@@ -19,22 +19,12 @@ secrets/postgres.env:
 	@echo "Generating postgres password in $@"
 	@echo "POSTGRES_PASSWORD=$(shell openssl rand -hex 32)" > $@
 
-secrets/oauth.env:
-	@echo "Need oauth.env file in secrets with GitHub parameters"
-	@exit 1
-
 secrets/jupyterhub.crt:
 	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
 	@exit 1
 
 secrets/jupyterhub.key:
 	@echo "Need an SSL key in secrets/jupyterhub.key"
-	@exit 1
-
-userlist:
-	@echo "Add usernames, one per line, to ./userlist, such as:"
-	@echo "    zoe admin"
-	@echo "    wash"
 	@exit 1
 
 # Do not require cert/key files if SECRETS_VOLUME defined
@@ -45,7 +35,7 @@ else
 	cert_files=
 endif
 
-check-files: userlist $(cert_files) secrets/oauth.env secrets/postgres.env
+check-files: $(cert_files) secrets/postgres.env
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)

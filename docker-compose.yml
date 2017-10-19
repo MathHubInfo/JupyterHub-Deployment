@@ -52,7 +52,6 @@ services:
       POSTGRES_HOST: hub-db
     env_file:
       - secrets/postgres.env
-      - secrets/oauth.env
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
