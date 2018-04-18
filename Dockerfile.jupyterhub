@@ -12,11 +12,11 @@ RUN /opt/conda/bin/conda install -yq psycopg2=2.7 && \
 RUN pip install git+https://github.com/jupyterhub/tmpauthenticator
 RUN pip install jupyterhub-tmpauthenticator
 # Copy TLS certificate and key
-ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
-ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
-COPY ./secrets/*.crt $SSL_CERT
-COPY ./secrets/*.key $SSL_KEY
-RUN chmod 700 /srv/jupyterhub/secrets && \
-    chmod 600 /srv/jupyterhub/secrets/*
+# ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
+# ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
+# COPY ./secrets/*.crt $SSL_CERT
+# COPY ./secrets/*.key $SSL_KEY
+# RUN chmod 700 /srv/jupyterhub/secrets && \
+#     chmod 600 /srv/jupyterhub/secrets/*
 
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
