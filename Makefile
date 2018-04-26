@@ -41,12 +41,12 @@ pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
 notebook_image: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-interview
-	# docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
-	# 	--file singleuser/Dockerfile-mmt \
-	# 	--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
-	# 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-	# 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-	# 	singleuser
+	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
+		--file singleuser/Dockerfile-mmt \
+		--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		singleuser
 
 	# Theresas interview image
 	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_INTERVIEW)  \
