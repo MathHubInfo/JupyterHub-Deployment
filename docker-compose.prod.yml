@@ -107,6 +107,10 @@ volumes:
     external:
       name: ${DB_VOLUME_HOST}
   mmtdata:
+  portainer:
+  vhost:
+  html:
+  certs:
 
 networks:
   default:
