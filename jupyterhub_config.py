@@ -6,14 +6,39 @@ import os
 
 c = get_config()
 
+from dockerspawner import DockerSpawner
+
+class FormSpawner(DockerSpawner):
+    def _options_form_default(self):
+        default_image  = "jupyter/minimal-notebook"
+        return """
+        <label for="notebook_image">Select your desired Notebook image</label>
+        <select name="notebook_image" size="1">
+        <option value="MMT">MMT </option>
+        <option value="Interview">Interview </option>
+        </select>
+        """.format(notebook_image=default_image)
+
+    def options_from_form(self, formdata):
+        options = {}
+        options['notebook_image'] = formdata['notebook_image']
+        container_image = ''.join(formdata['notebook_image'])
+        if container_image == 'MMT':
+            print("SPAWN: " + container_image + " IMAGE" )
+            self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
+        elif container_image == 'Interview':
+            print("SPAWN: " + container_image + " IMAGE" )
+            self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_INTERVIEW']
+        else:
+            print("No valid option!")
+        return options
+
+c.JupyterHub.spawner_class = FormSpawner
+
 # We rely on environment variables to configure JupyterHub so that we
 # avoid having to rebuild the JupyterHub container every time we change a
 # configuration parameter.
 
-# Spawn single-user servers as Docker containers
-c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
-# Spawn containers from this image
-c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # JupyterHub requires a single-user instance of the Notebook server, so we
 # default to using the `start-singleuser.sh` script included in the
 # jupyter/docker-stacks *-notebook images as the Docker run command when
@@ -36,7 +61,7 @@ c.DockerSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
-c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
+# c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
@@ -47,9 +72,9 @@ c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
 
 # TLS config
-c.JupyterHub.port = 443
-c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+c.JupyterHub.port = 80
+#c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+#c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 # Authenticate users with TmpAuthenticator
 c.JupyterHub.authenticator_class = 'tmpauthenticator.TmpAuthenticator'

@@ -30,7 +30,7 @@ secrets/jupyterhub.key:
 # Do not require cert/key files if SECRETS_VOLUME defined
 secrets_volume = $(shell echo $(SECRETS_VOLUME))
 ifeq ($(secrets_volume),)
-	cert_files=secrets/jupyterhub.crt secrets/jupyterhub.key
+	cert_files=
 else
 	cert_files=
 endif
@@ -40,11 +40,21 @@ check-files: $(cert_files) secrets/postgres.env
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
-notebook_image: pull singleuser/Dockerfile
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-		singleuser
+notebook_image: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-interview
+	# docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
+	# 	--file singleuser/Dockerfile-mmt \
+	# 	--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
+	# 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+	# 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+	# 	singleuser
+
+	# Theresas interview image
+	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_INTERVIEW)  \
+	 	--file singleuser/Dockerfile-interview \
+	 	--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
+	 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+	 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+	 	singleuser
 
 build: check-files network volumes
 	docker-compose build

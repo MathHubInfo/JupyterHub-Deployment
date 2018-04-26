@@ -5,6 +5,18 @@
 version: "2"
 
 services:
+  mmt-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mmt
+    container_name: mmt-server
+    restart: always
+    entrypoint: ["java", "-jar", "/root/MMT/deploy/mmt.jar", "-w", "--mbt=/startup.mbt"]
+    ports:
+      - "9000:9000"
+    volumes:
+      - "mmtdata:/content"
+
   hub-db:
     image: postgres:9.5
     container_name: jupyterhub-db
@@ -35,14 +47,19 @@ services:
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
     ports:
-      - "443:443"
+      - "80:80"
     links:
       - hub-db
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
-      # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${LOCAL_NOTEBOOK_IMAGE}
+
+      # JupyterHub will spawn these Notebook images for users
+      # The MMT Kernel Image
+      DOCKER_NOTEBOOK_IMAGE_MMT: ${LOCAL_NOTEBOOK_IMAGE_MMT}
+      # The Interview Notebook Image
+      DOCKER_NOTEBOOK_IMAGE_INTERVIEW: ${LOCAL_NOTEBOOK_IMAGE_INTERVIEW}
+
       # Notebook directory inside user image
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
       # Using this run command (optional)
@@ -62,6 +79,7 @@ volumes:
   db:
     external:
       name: ${DB_VOLUME_HOST}
+  mmtdata:
 
 networks:
   default:
