@@ -44,6 +44,7 @@ notebook_image: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-interview
 	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
 		--file singleuser/Dockerfile-mmt \
 		--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
+		--build-arg MMT_FRONTEND_BASE_URL=$(MMT_FRONTEND_BASE_URL) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
@@ -52,6 +53,7 @@ notebook_image: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-interview
 	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_INTERVIEW)  \
 	 	--file singleuser/Dockerfile-interview \
 	 	--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
+		--build-arg MMT_FRONTEND_BASE_URL=$(MMT_FRONTEND_BASE_URL) \
 	 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 	 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 	 	singleuser
