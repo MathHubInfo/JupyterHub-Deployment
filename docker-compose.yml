@@ -5,6 +5,33 @@
 version: "2"
 
 services:
+  nginx-proxy:
+    labels:
+      "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
+    container_name: nginx
+    image: jwilder/nginx-proxy:${NGINX_PROXY_VERSION}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "vhost:/etc/nginx/vhost.d"
+      - "html:/usr/share/nginx/html"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "certs:/etc/nginx/certs"
+    restart: always
+    env_file:
+      - .config/nginx
+
+  letsencrypt-nginx-proxy-companion:
+    container_name: letsencrypt
+    image: jrcs/letsencrypt-nginx-proxy-companion:${PROXY_COMPANION_VERSION}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "vhost:/etc/nginx/vhost.d"
+      - "html:/usr/share/nginx/html"
+      - "certs:/etc/nginx/certs"
+    restart: always
+
   mmt-server:
     build:
       context: .
@@ -12,6 +39,13 @@ services:
     container_name: mmt-server
     restart: always
     entrypoint: ["/mmt/deploy/mmt", "-w", "--mbt=/startup.mbt"]
+    environment:
+      VIRTUAL_HOST: ${MMT_DOMAIN_NAME}
+      LETSENCRYPT_HOST: ${MMT_DOMAIN_NAME}
+      LETSENCRYPT_EMAIL: ${JUPYTERHUB_SSL_EMAIL}
+      VIRTUAL_PORT: 80
+    env_file:
+      - .config/mmt
     ports:
       - "9000:9000"
     volumes:
@@ -25,7 +59,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: ${DB_VOLUME_CONTAINER}
     env_file:
-      - secrets/postgres.env
+      - .config/postgres
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
 
@@ -47,10 +81,16 @@ services:
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
     ports:
-      - "80:80"
+      - "80"
     links:
       - hub-db
+
     environment:
+      VIRTUAL_HOST: ${JUPYTERHUB_DOMAIN_NAME}
+      LETSENCRYPT_HOST: ${JUPYTERHUB_DOMAIN_NAME}
+      LETSENCRYPT_EMAIL: ${JUPYTERHUB_SSL_EMAIL}
+      VIRTUAL_PORT: 80
+
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
 
@@ -68,7 +108,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
     env_file:
-      - secrets/postgres.env
+      - .config/postgres
+      - .config/jupyterhub
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
@@ -80,6 +121,10 @@ volumes:
     external:
       name: ${DB_VOLUME_HOST}
   mmtdata:
+  portainer:
+  vhost:
+  html:
+  certs:
 
 networks:
   default:

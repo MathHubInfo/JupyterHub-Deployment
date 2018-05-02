@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 include .env
+include .config/makefile
 
 .DEFAULT_GOAL=build
 
@@ -35,7 +36,7 @@ else
 	cert_files=
 endif
 
-check-files: $(cert_files) secrets/postgres.env
+check-files: $(cert_files) .config/postgres
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)

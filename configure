@@ -1,0 +1,165 @@
+#!/bin/bash
+
+function read_jupyterhub_domain_name() {
+    cat << EOF
+When running in a production setup, JupyterHub needs to know the domain
+name it is running under. Please either enter a domain name now, or
+leave it blank to use "localhost".
+EOF
+
+    printf "JUPYTERHUB_DOMAIN_NAME="
+    read JUPYTERHUB_DOMAIN_NAME
+    if [ -z "$JUPYTERHUB_DOMAIN_NAME" ]
+    then
+        JUPYTERHUB_DOMAIN_NAME="localhost"
+    fi;
+
+    echo "export JUPYTERHUB_DOMAIN_NAME=$JUPYTERHUB_DOMAIN_NAME"
+}
+
+function read_mmt_domain_name() {
+    cat << EOF
+When running in a production setup, the MMT-server needs to know the domain
+name it is running under. Please either enter a domain name now, or
+leave it blank to use "mmt.$JUPYTERHUB_DOMAIN_NAME"
+EOF
+
+    printf "MMT_DOMAIN_NAME="
+    read MMT_DOMAIN_NAME
+    if [ -z "$MMT_DOMAIN_NAME" ]
+    then
+        MMT_DOMAIN_NAME="mmt.$JUPYTERHUB_DOMAIN_NAME"
+    fi;
+
+    echo "export MMT_DOMAIN_NAME=$MMT_DOMAIN_NAME"
+}
+
+function read_and_write_mmt_archives() {
+    cat << EOF
+If you have any MMT-archives that you would like to install, please state them here.
+When you're done leave the prompt blank.
+EOF
+    rm -f .config/mmt-archives
+    printf "MMT_ARCHIVE="
+    read MMT_ARCHIVE
+    while [ ! -z "$MMT_ARCHIVE" ]
+    do
+        echo "$MMT_ARCHIVE" >> .config/mmt-archives
+        printf "MMT_ARCHIVE="
+        read MMT_ARCHIVE
+    done;
+
+    echo "Installing:"
+    echo "$(cat -b .config/mmt-archives)"
+}
+
+function read_db_password() {
+    cat << EOF
+Please select a database password, or leave it blank to use: 12345.
+If you have openssl installed you can also generate a password by typing: openssl
+EOF
+
+    printf "POSTGRES_PASSWORD="
+    read POSTGRES_PASSWORD
+    if [ -z "$POSTGRES_PASSWORD" ]
+    then
+      POSTGRES_PASSWORD="12345"
+    fi;
+    if [ "$POSTGRES_PASSWORD" = "openssl" ]
+    then
+      echo "Generating postgres password"
+      POSTGRES_PASSWORD=$(openssl rand -hex 32)
+    fi;
+
+    echo "export POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+}
+
+function read_jupyterhub_ssl_email() {
+    cat << EOF
+If SSL Certificates should be automatically retrieved, JupyterHub needs to
+know an email address to register a new Let’s Encrypt account under.
+Please note by entering an email address here, you implicitly agree to
+the Let’s Encrypt subscriber agreement currently found under
+https://letsencrypt.org/documents/2017.11.15-LE-SA-v1.2.pdf.
+EOF
+
+    printf "JUPYTERHUB_SSL_EMAIL="
+    read JUPYTERHUB_SSL_EMAIL
+    echo "export JUPYTERHUB_SSL_EMAIL=$JUPYTERHUB_SSL_EMAIL"
+}
+
+
+function write_nginx_config() {
+    echo "DEFAULT_HOST=$JUPYTERHUB_DOMAIN_NAME" > .config/nginx
+
+    echo "Wrote .config/nginx"
+}
+
+function write_makefile_config() {
+    echo "MMT_FRONTEND_BASE_URL=$MMT_DOMAIN_NAME" > .config/makefile
+
+    echo "Wrote .config/makefile"
+}
+
+
+function write_jupyterhub_config() {
+    echo "VIRTUAL_HOST=$JUPYTERHUB_DOMAIN_NAME" > .config/jupyterhub
+
+    if [ ! -z "$JUPYTERHUB_SSL_EMAIL" ]; then
+        echo "LETSENCRYPT_HOST=$JUPYTERHUB_DOMAIN_NAME" >> .config/jupyterhub
+        echo "LETSENCRYPT_EMAIL=$JUPYTERHUB_SSL_EMAIL"  >> .config/jupyterhub
+    fi;
+
+    echo "Wrote .config/jupyterhub"
+}
+
+function write_mmt_config() {
+    echo "VIRTUAL_HOST=$MMT_DOMAIN_NAME" > .config/mmt
+
+    if [ ! -z "$JUPYTERHUB_SSL_EMAIL" ]; then
+        echo "LETSENCRYPT_HOST=$MMT_DOMAIN_NAME" >> .config/mmt
+        echo "LETSENCRYPT_EMAIL=$JUPYTERHUB_SSL_EMAIL"  >> .config/mmt
+    fi;
+
+    echo "Wrote .config/mmt"
+}
+
+function write_db_password() {
+    echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" > .config/postgres
+
+    echo "Wrote .config/postgres"
+}
+
+
+function main() {
+    echo "JUPYTERHUB DOCKER CONFIGURATION"
+
+    echo ""
+    read_jupyterhub_domain_name
+
+    echo ""
+    read_mmt_domain_name
+
+    echo ""
+    read_and_write_mmt_archives
+
+    echo ""
+    read_jupyterhub_ssl_email
+
+    echo ""
+    read_db_password
+
+    echo ""
+    echo "WRITING CONFIGURATION"
+
+    mkdir -p .config
+
+    write_nginx_config
+    write_makefile_config
+    write_jupyterhub_config
+    write_mmt_config
+    write_db_password
+    echo "Done. "
+}
+
+main
