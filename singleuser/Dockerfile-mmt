@@ -3,6 +3,9 @@ FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
 ARG MMT_BASE_URL
 ENV MMT_BASE_URL $MMT_BASE_URL
+ARG MMT_FRONTEND_BASE_URL
+ENV MMT_FRONTEND_BASE_URL $MMT_FRONTEND_BASE_URL
+
 RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION \
     && python3 -m pip install git+https://github.com/UniFormal/mmt_jupyter_kernel.git \
     && python3 -m mmt_kernel.install \
