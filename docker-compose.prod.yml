@@ -38,7 +38,7 @@ services:
       VIRTUAL_HOST: mmt.mosis.mathhub.info
       LETSENCRYPT_HOST: mmt.mosis.mathhub.info
       LETSENCRYPT_EMAIL: admin@mathhub.info
-      VIRTUAL_PORT: 80
+      VIRTUAL_PORT: 9000
     ports:
       - "9000:9000"
     volumes:
