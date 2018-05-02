@@ -12,10 +12,16 @@ class FormSpawner(DockerSpawner):
     def _options_form_default(self):
         default_image  = "jupyter/minimal-notebook"
         return """
+        <div> To spawn a <a href="https://gl.kwarc.info/theresa_pollinger/MoSIS">MoSIS</a> notebook please select <b>MoSIS</b> and click on the <b>Spawn</b> button below. </div>
+        <div> Now navigate to the <b>New</b> dropdown menu on the right and select <b>MoSIS</b>. </div>
+        <div> Similarly to this you can also spawn a <a href="https://github.com/UniFormal/mmt_jupyter_kernel">MMT</a> notebook.</div>
         <label for="notebook_image">Select your desired Notebook image</label>
         <select name="notebook_image" size="1">
+        <option value="MoSIS">MoSIS </option>
         <option value="MMT">MMT </option>
-        <option value="Interview">Interview </option>
+        <script>
+            document.title = "MoSIS"
+        </script>
         </select>
         """.format(notebook_image=default_image)
 
@@ -26,7 +32,7 @@ class FormSpawner(DockerSpawner):
         if container_image == 'MMT':
             print("SPAWN: " + container_image + " IMAGE" )
             self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
-        elif container_image == 'Interview':
+        elif container_image == 'MoSIS':
             print("SPAWN: " + container_image + " IMAGE" )
             self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_INTERVIEW']
         else:
