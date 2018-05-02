@@ -11,7 +11,7 @@ services:
       dockerfile: Dockerfile.mmt
     container_name: mmt-server
     restart: always
-    entrypoint: ["java", "-jar", "/root/MMT/deploy/mmt.jar", "-w", "--mbt=/startup.mbt"]
+    entrypoint: ["/mmt/deploy/mmt", "-w", "--mbt=/startup.mbt"]
     ports:
       - "9000:9000"
     volumes:
