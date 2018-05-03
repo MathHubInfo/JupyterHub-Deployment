@@ -40,9 +40,6 @@ services:
     restart: always
     entrypoint: ["/mmt/deploy/mmt", "-w", "--mbt=/startup.mbt"]
     environment:
-      VIRTUAL_HOST: ${MMT_DOMAIN_NAME}
-      LETSENCRYPT_HOST: ${MMT_DOMAIN_NAME}
-      LETSENCRYPT_EMAIL: ${JUPYTERHUB_SSL_EMAIL}
       VIRTUAL_PORT: 80
     env_file:
       - .config/mmt
@@ -86,9 +83,7 @@ services:
       - hub-db
 
     environment:
-      VIRTUAL_HOST: ${JUPYTERHUB_DOMAIN_NAME}
-      LETSENCRYPT_HOST: ${JUPYTERHUB_DOMAIN_NAME}
-      LETSENCRYPT_EMAIL: ${JUPYTERHUB_SSL_EMAIL}
+      MMT_BASE_URL : "http://mmt-server:9000"
       VIRTUAL_PORT: 80
 
       # All containers will join this network

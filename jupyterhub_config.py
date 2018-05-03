@@ -9,6 +9,11 @@ c = get_config()
 from dockerspawner import DockerSpawner
 
 class FormSpawner(DockerSpawner):
+
+    def __init__(self, *args, **kwargs):
+        super(FormSpawner, self).__init__(*args, **kwargs)
+        self.env_keep += ['MMT_BASE_URL','MMT_FRONTEND_BASE_URL']
+
     def _options_form_default(self):
         default_image  = "jupyter/minimal-notebook"
         return """

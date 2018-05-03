@@ -28,7 +28,7 @@ EOF
     read MMT_DOMAIN_NAME
     if [ -z "$MMT_DOMAIN_NAME" ]
     then
-        MMT_DOMAIN_NAME="mmt.$JUPYTERHUB_DOMAIN_NAME"
+      MMT_DOMAIN_NAME="127.0.0.1"
     fi;
 
     echo "export MMT_DOMAIN_NAME=$MMT_DOMAIN_NAME"
@@ -48,9 +48,14 @@ EOF
         printf "MMT_ARCHIVE="
         read MMT_ARCHIVE
     done;
+    if [ ! -f .config/mmt-archives ]
+    then
+      echo "Not installing additional archives."
+    else
+      echo "Installing:"
+      echo "$(cat -b .config/mmt-archives)"
+    fi;
 
-    echo "Installing:"
-    echo "$(cat -b .config/mmt-archives)"
 }
 
 function read_db_password() {
@@ -105,9 +110,13 @@ function write_makefile_config() {
 function write_jupyterhub_config() {
     echo "VIRTUAL_HOST=$JUPYTERHUB_DOMAIN_NAME" > .config/jupyterhub
 
+
     if [ ! -z "$JUPYTERHUB_SSL_EMAIL" ]; then
+        echo "MMT_FRONTEND_BASE_URL=https://$MMT_DOMAIN_NAME" >> .config/jupyterhub
         echo "LETSENCRYPT_HOST=$JUPYTERHUB_DOMAIN_NAME" >> .config/jupyterhub
         echo "LETSENCRYPT_EMAIL=$JUPYTERHUB_SSL_EMAIL"  >> .config/jupyterhub
+    else
+      echo "MMT_FRONTEND_BASE_URL=http://$MMT_DOMAIN_NAME" >> .config/jupyterhub
     fi;
 
     echo "Wrote .config/jupyterhub"

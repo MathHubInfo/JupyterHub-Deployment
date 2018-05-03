@@ -1,10 +1,6 @@
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
-ARG MMT_BASE_URL
-ENV MMT_BASE_URL $MMT_BASE_URL
-ARG MMT_FRONTEND_BASE_URL
-ENV MMT_FRONTEND_BASE_URL $MMT_FRONTEND_BASE_URL
 
 USER root
 RUN apt-get update && apt-get install -y openjdk-8-jre-headless && apt-get clean
@@ -16,4 +12,5 @@ RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION \
     && git clone https://github.com/kwarc/jupyter-console-standalone \
     && cd jupyter-console-standalone/jcs/files && npm install && npm run build && cd ../../ \
     && python setup.py install && jupyter serverextension enable --sys-prefix --py jcs && cd .. \
-    && rm -rf jupyter-console-standalone
+    && rm -rf jupyter-console-standalone \
+    && wget https://gl.kwarc.info/theresa_pollinger/MoSIS/raw/master/example_notebook.ipynb

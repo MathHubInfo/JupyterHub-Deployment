@@ -40,21 +40,42 @@ check-files: $(cert_files) .config/postgres
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
+	docker pull kwarc/mmt:devel
 
-notebook_image: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-interview
-	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
+# builds the images
+notebook_images: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-mosis mmt_image mosis_image
+
+# builds the images without cache
+force_notebook_images: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-mosis force_mmt_image force_mosis_image
+
+# builds the MoSIS image
+mmt_image: singleuser/Dockerfile-mmt
+	docker build -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
 		--file singleuser/Dockerfile-mmt \
-		--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
-		--build-arg MMT_FRONTEND_BASE_URL=$(MMT_FRONTEND_BASE_URL) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		singleuser
 
-	# Theresas interview image
+# builds the MMT image without cache
+force_mmt_image: singleuser/Dockerfile-mmt
+	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
+		--file singleuser/Dockerfile-mmt \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		singleuser
+
+# builds the MoSIS image
+mosis_image: singleuser/Dockerfile-mosis
+	docker build -t $(LOCAL_NOTEBOOK_IMAGE_INTERVIEW)  \
+	 	--file singleuser/Dockerfile-mosis \
+	 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+	 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+	 	singleuser
+
+# builds the MoSIS image without  cache
+force_mosis_image: singleuser/Dockerfile-mosis
 	docker build --no-cache -t $(LOCAL_NOTEBOOK_IMAGE_INTERVIEW)  \
-	 	--file singleuser/Dockerfile-interview \
-	 	--build-arg MMT_BASE_URL=$(MMT_BASE_URL) \
-		--build-arg MMT_FRONTEND_BASE_URL=$(MMT_FRONTEND_BASE_URL) \
+		--file singleuser/Dockerfile-mosis \
 	 	--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 	 	--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 	 	singleuser
