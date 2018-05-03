@@ -40,7 +40,7 @@ services:
     restart: always
     entrypoint: ["/mmt/deploy/mmt", "-w", "--mbt=/startup.mbt"]
     environment:
-      VIRTUAL_PORT: 80
+      VIRTUAL_PORT: 9000
     env_file:
       - .config/mmt
     ports:
