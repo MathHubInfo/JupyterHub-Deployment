@@ -2,13 +2,12 @@
 # Distributed under the terms of the Modified BSD License.
 
 # JupyterHub docker-compose configuration file
-version: "2"
+version: "3.6"
 
 services:
   nginx-proxy:
     labels:
       "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
-    container_name: nginx
     image: jwilder/nginx-proxy:${NGINX_PROXY_VERSION}
     ports:
       - "80:80"
@@ -23,7 +22,6 @@ services:
       - .config/nginx
 
   letsencrypt-nginx-proxy-companion:
-    container_name: letsencrypt
     image: jrcs/letsencrypt-nginx-proxy-companion:${PROXY_COMPANION_VERSION}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -31,20 +29,19 @@ services:
       - "html:/usr/share/nginx/html"
       - "certs:/etc/nginx/certs"
     restart: always
-
+  
+  # TODO: Migrate to unbuilt mmt image when script is ready
   mmt-server:
     build:
       context: .
       dockerfile: Dockerfile.mmt
     container_name: mmt-server
     restart: always
-    entrypoint: ["/mmt/deploy/mmt", "-w", "--mbt=/startup.mbt"]
+    command: ["-w", "--mbt=/startup.mbt"]
     environment:
       VIRTUAL_PORT: 9000
     env_file:
       - .config/mmt
-    ports:
-      - "9000:9000"
     volumes:
       - "mmtdata:/content"
 
@@ -61,47 +58,32 @@ services:
       - "db:${DB_VOLUME_CONTAINER}"
 
   hub:
+    image: mathhub/jupyter
     depends_on:
       - hub-db
-    build:
-      context: .
-      dockerfile: Dockerfile.jupyterhub
-      args:
-        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
     restart: always
-    image: jupyterhub
     container_name: jupyterhub
     volumes:
-      # Bind Docker socket on the host so we can connect to the daemon from
-      # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
     ports:
       - "80"
-    links:
-      - hub-db
 
     environment:
       MMT_BASE_URL : "http://mmt-server:9000"
       VIRTUAL_PORT: 80
 
-      # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
-
-      # JupyterHub will spawn these Notebook images for users
-      # The MMT Kernel Image
+      
       DOCKER_NOTEBOOK_IMAGE_MMT: ${LOCAL_NOTEBOOK_IMAGE_MMT}
-      # The Interview Notebook Image
       DOCKER_NOTEBOOK_IMAGE_INTERVIEW: ${LOCAL_NOTEBOOK_IMAGE_INTERVIEW}
 
-      # Notebook directory inside user image
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
-      # Using this run command (optional)
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
-      # Postgres db info
+    
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
+    
     env_file:
       - .config/postgres
       - .config/jupyterhub
