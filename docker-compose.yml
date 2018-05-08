@@ -29,19 +29,18 @@ services:
       - "html:/usr/share/nginx/html"
       - "certs:/etc/nginx/certs"
     restart: always
-  
-  # TODO: Migrate to unbuilt mmt image when script is ready
+
   mmt-server:
-    build:
-      context: .
-      dockerfile: Dockerfile.mmt
+    image: kwarc/mmt:${MMT_VERSION}
     container_name: mmt-server
     restart: always
     command: ["-w", "--mbt=/startup.mbt"]
     environment:
       VIRTUAL_PORT: 9000
+      MMT_ARCHIVES: " "
     env_file:
       - .config/mmt
+      - .config/mmt-archives
     volumes:
       - "mmtdata:/content"
 
@@ -74,16 +73,16 @@ services:
       VIRTUAL_PORT: 80
 
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
-      
+
       DOCKER_NOTEBOOK_IMAGE_MMT: ${LOCAL_NOTEBOOK_IMAGE_MMT}
       DOCKER_NOTEBOOK_IMAGE_INTERVIEW: ${LOCAL_NOTEBOOK_IMAGE_INTERVIEW}
 
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
-    
+
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
-    
+
     env_file:
       - .config/postgres
       - .config/jupyterhub

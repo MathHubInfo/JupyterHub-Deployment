@@ -34,28 +34,18 @@ EOF
     echo "export MMT_DOMAIN_NAME=$MMT_DOMAIN_NAME"
 }
 
-function read_and_write_mmt_archives() {
+function read_mmt_archives() {
     cat << EOF
-If you have any MMT-archives that you would like to install, please state them here.
-When you're done leave the prompt blank.
+If you have any MMT-archives that you would like to install, please state them space-separated here.
 EOF
     rm -f .config/mmt-archives
-    printf "MMT_ARCHIVE="
-    read MMT_ARCHIVE
-    while [ ! -z "$MMT_ARCHIVE" ]
-    do
-        echo "$MMT_ARCHIVE" >> .config/mmt-archives
-        printf "MMT_ARCHIVE="
-        read MMT_ARCHIVE
-    done;
-    if [ ! -f .config/mmt-archives ]
+    printf "MMT_ARCHIVES="
+    read MMT_ARCHIVES
+    if [ -z "$MMT_ARCHIVES" ]
     then
-      echo "Not installing additional archives."
-    else
-      echo "Installing:"
-      echo "$(cat -b .config/mmt-archives)"
+        MMT_ARCHIVES="MitM/smglom MitM/MoSIS"
     fi;
-
+      echo "Installing: $MMT_ARCHIVES"
 }
 
 function read_db_password() {
@@ -98,6 +88,11 @@ function write_nginx_config() {
     echo "DEFAULT_HOST=$JUPYTERHUB_DOMAIN_NAME" > .config/nginx
 
     echo "Wrote .config/nginx"
+}
+
+function write_mmt_archives() {
+    echo "MMT_ARCHIVES=$MMT_ARCHIVES" > .config/mmt-archives
+    echo "Wrote .config/mmt-archives"
 }
 
 function write_makefile_config() {
@@ -150,7 +145,7 @@ function main() {
     read_mmt_domain_name
 
     echo ""
-    read_and_write_mmt_archives
+    read_mmt_archives
 
     echo ""
     read_jupyterhub_ssl_email
@@ -163,6 +158,7 @@ function main() {
 
     mkdir -p .config
 
+    write_mmt_archives
     write_nginx_config
     write_makefile_config
     write_jupyterhub_config
