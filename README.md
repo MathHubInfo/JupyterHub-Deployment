@@ -1,6 +1,6 @@
-# jupyterhub-console-deploy-docker
+# JupyterHub-Deployment
 
-**jupyterhub-console-deploy-docker** provides a reference deployment of [jupyter-console-standalone](https://github.com/kwarc/jupyter-console-standalone), the [mmt_kernel](https://github.com/UniFormal/mmt_jupyter_kernel) and the MoSIS [interview_kernel](https://gl.kwarc.info/theresa_pollinger/MoSIS) using [Docker](https://docs.docker.com).
+**JupyterHub-Deployment** provides a reference deployment of [jupyter-console-standalone](https://github.com/kwarc/jupyter-console-standalone), the [mmt_kernel](https://github.com/UniFormal/mmt_jupyter_kernel) and the [MoSIS interview_kernel](https://github.com/MathHubInfo/MoSIS_Jupyter_Kernel) using [Docker](https://docs.docker.com).
 
 ## Disclaimer
 
@@ -12,7 +12,7 @@ requirements in terms of availability nor scalability.
 
 Key components of this reference deployment are:
 
-* **Host**: Runs the [JupyterHub components](https://jupyterhub.readthedocs.org/en/latest/getting-started.html#overview)
+* **Host**: Runs the [JupyterHub components](https://jupyterhub.readthedocs.org/en/latest/getting-started.html#overview) and a [MMT](https://uniformal.github.io/) server
   in a Docker container on the host.
 
 * **Authenticator**: Uses [tmpauthenticator](https://github.com/jupyterhub/tmpauthenticator) to create user accounts on the fly.
@@ -44,28 +44,13 @@ required.
    ```
 
 
-## Build the JupyterHub Docker image
+## Configure your setup
 
-Finish configuring JupyterHub and then build the hub's Docker image. (We'll
-build the Jupyter Notebook image in the next section.)
-
-1. Use [docker-compose](https://docs.docker.com/compose/reference/) to build
-   the JupyterHub Docker image on the active Docker machine host by running
-   the `make build` command:
-
-   ```bash
-   make build
-   ```
-
-
-## Spawner: Prepare the Jupyter Notebook Image
-
-You can pull the image using the following command:
-
-```bash
-make notebook_image
+Run the configure script with:
+``` bash
+./configure
 ```
-
+Here you can choose your domain name and also state additional archives that should be installed to your MMT.
 
 ## Run JupyterHub
 
@@ -80,7 +65,7 @@ docker-compose up -d
 Once the container is running, you should be able to access the JupyterHub console at
 
 ```
-https://localhost:80
+https://mydomain
 ```
 
 To bring down the JupyterHub container:

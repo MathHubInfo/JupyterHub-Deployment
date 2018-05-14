@@ -21,7 +21,7 @@ function read_mmt_domain_name() {
     cat << EOF
 When running in a production setup, the MMT-server needs to know the domain
 name it is running under. Please either enter a domain name now, or
-leave it blank to use "mmt.$JUPYTERHUB_DOMAIN_NAME"
+leave it blank to use "127.0.0.1"
 EOF
 
     printf "MMT_DOMAIN_NAME="
