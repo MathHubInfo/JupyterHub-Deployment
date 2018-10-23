@@ -69,7 +69,8 @@ services:
       - "80"
 
     environment:
-      MMT_BASE_URL : "http://mmt-server:9000"
+      MMT_BASE_URL: "http://mmt-server:9000"
+      MMT_VOLUME_HOST: ${MMT_VOLUME_HOST}
       VIRTUAL_PORT: 80
 
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
