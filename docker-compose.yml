@@ -97,6 +97,8 @@ volumes:
     external:
       name: ${DB_VOLUME_HOST}
   mmtdata:
+    external:
+      name: ${MMT_VOLUME_HOST}
   portainer:
   vhost:
   html:
