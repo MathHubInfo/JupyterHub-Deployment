@@ -12,6 +12,7 @@ network:
 volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
 	@docker volume inspect $(DB_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DB_VOLUME_HOST)
+	@docker volume inspect $(MMT_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(MMT_VOLUME_HOST)
 
 self-signed-cert:
 	# make a self-signed cert
@@ -40,6 +41,7 @@ check-files: $(cert_files) .config/postgres
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
+	docker pull $(LOCAL_NOTEBOOK_IMAGE_MMT)
 	docker pull kwarc/mmt:devel
 
 # builds the images
@@ -48,7 +50,7 @@ notebook_images: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-mosis mmt_
 # builds the images without cache
 force_notebook_images: pull singleuser/Dockerfile-mmt singleuser/Dockerfile-mosis force_mmt_image force_mosis_image
 
-# builds the MoSIS image
+# builds the MMT image
 mmt_image: singleuser/Dockerfile-mmt
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE_MMT) \
 		--file singleuser/Dockerfile-mmt \
@@ -81,6 +83,7 @@ force_mosis_image: singleuser/Dockerfile-mosis
 	 	singleuser
 
 build: check-files network volumes
+	docker build -t mathhub/jupyter .
 	docker-compose build
 
 .PHONY: network volumes check-files pull notebook_image build

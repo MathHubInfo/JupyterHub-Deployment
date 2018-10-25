@@ -43,7 +43,7 @@ EOF
     read MMT_ARCHIVES
     if [ -z "$MMT_ARCHIVES" ]
     then
-        MMT_ARCHIVES="MitM/smglom MitM/MoSIS"
+        MMT_ARCHIVES="meta/inf MMT/urtheories MMT/LFX MitM/smglom MitM/MoSIS"
     fi;
       echo "Installing: $MMT_ARCHIVES"
 }
@@ -86,7 +86,6 @@ EOF
 
 function write_nginx_config() {
     echo "DEFAULT_HOST=$JUPYTERHUB_DOMAIN_NAME" > .config/nginx
-
     echo "Wrote .config/nginx"
 }
 
@@ -97,7 +96,6 @@ function write_mmt_archives() {
 
 function write_makefile_config() {
     echo "MMT_FRONTEND_BASE_URL=$MMT_DOMAIN_NAME" > .config/makefile
-
     echo "Wrote .config/makefile"
 }
 
@@ -130,7 +128,6 @@ function write_mmt_config() {
 
 function write_db_password() {
     echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" > .config/postgres
-
     echo "Wrote .config/postgres"
 }
 

@@ -34,10 +34,9 @@ services:
     image: kwarc/mmt:${MMT_VERSION}
     container_name: mmt-server
     restart: always
-    command: ["-w", "--mbt=/startup.mbt"]
+    command: ["-w", "--file=/content/MathHub/meta/inf/mathhub.msl"]
     environment:
       VIRTUAL_PORT: 9000
-      MMT_ARCHIVES: " "
     env_file:
       - .config/mmt
       - .config/mmt-archives

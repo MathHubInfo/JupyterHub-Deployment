@@ -12,37 +12,48 @@ class FormSpawner(DockerSpawner):
 
     def __init__(self, *args, **kwargs):
         super(FormSpawner, self).__init__(*args, **kwargs)
-        self.env_keep += ['MMT_BASE_URL','MMT_FRONTEND_BASE_URL']
+        self.env_keep += ['MMT_BASE_URL','MMT_FRONTEND_BASE_URL', 'UPLOAD_REDIRECT_PREFIX']
+        self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
 
-    def _options_form_default(self):
-        default_image  = "jupyter/minimal-notebook"
-        return """
-        <div> To spawn a <a href="https://gl.kwarc.info/theresa_pollinger/MoSIS">MoSIS</a> notebook please select <b>MoSIS</b> and click on the <b>Spawn</b> button below. </div>
-        <div> Now navigate to the <b>New</b> dropdown menu on the right and select <b>MoSIS</b>. </div>
-        <div> Similarly to this you can also spawn a <a href="https://github.com/UniFormal/mmt_jupyter_kernel">MMT</a> notebook.</div>
-        <label for="notebook_image">Select your desired Notebook image</label>
-        <select name="notebook_image" size="1">
-        <option value="MoSIS">MoSIS </option>
-        <option value="MMT">MMT </option>
-        <script>
-            document.title = "MoSIS"
-        </script>
-        </select>
-        """.format(notebook_image=default_image)
+    # def _options_form_default(self):
+    #     default_image  = "jupyter/minimal-notebook"
+    #     # return """
+    #     # <div> To spawn a <a href="https://gl.kwarc.info/theresa_pollinger/MoSIS">MoSIS</a> notebook please select <b>MoSIS</b> and click on the <b>Spawn</b> button below. </div>
+    #     # <div> Now navigate to the <b>New</b> dropdown menu on the right and select <b>MoSIS</b>. </div>
+    #     # <div> Similarly to this you can also spawn a <a href="https://github.com/UniFormal/mmt_jupyter_kernel">MMT</a> notebook.</div>
+    #     # <label for="notebook_image">Select your desired Notebook image</label>
+    #     # <select name="notebook_image" size="1">
+    #     # <option value="MoSIS">MoSIS </option>
+    #     # <option value="MMT">MMT </option>
+    #     # <script>
+    #     #     document.title = "MoSIS"
+    #     # </script>
+    #     # </select>
+    #     # """.format(notebook_image=default_image)
+    #     self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
+    #     return """  
+    #     <img src=https://kwarc.info/public/kwarc_logo.svg height="100" width="100"></img>
+    #     <img src=https://www.simula.no/sites/default/files/styles/original_dimension_image/public/images/odk-elected-logo.png?itok=8nHPrdb3 height="100" width="71"></img>
+    #     <img src=https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1024px-Flag_of_Europe.svg.png height="100" width="150"></img>
+    #     <div> To spawn a <a href="https://github.com/UniFormal/mmt_jupyter_kernel">MMT</a> notebook click on the <b>Spawn</b> button below.</div>
+    #     """.format(notebook_image=default_image)
+        
 
-    def options_from_form(self, formdata):
-        options = {}
-        options['notebook_image'] = formdata['notebook_image']
-        container_image = ''.join(formdata['notebook_image'])
-        if container_image == 'MMT':
-            print("SPAWN: " + container_image + " IMAGE" )
-            self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
-        elif container_image == 'MoSIS':
-            print("SPAWN: " + container_image + " IMAGE" )
-            self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_INTERVIEW']
-        else:
-            print("No valid option!")
-        return options
+        
+
+    # def options_from_form(self, formdata):
+    #     options = {}
+    #     options['notebook_image'] = formdata['notebook_image']
+    #     container_image = ''.join(formdata['notebook_image'])
+    #     if container_image == 'MMT':
+    #         print("SPAWN: " + container_image + " IMAGE" )
+    #         self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
+    #     elif container_image == 'MoSIS':
+    #         print("SPAWN: " + container_image + " IMAGE" )
+    #         self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_INTERVIEW']
+    #     else:
+    #         print("No valid option!")
+    #     return options
 
 c.JupyterHub.spawner_class = FormSpawner
 
@@ -71,10 +82,9 @@ notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan/work'
 c.DockerSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
-c.DockerSpawner.volumes = { 
-    'jupyterhub-user-{username}': notebook_dir,
-    os.environ.get('MMT_VOLUME_HOST'): { bind: '/content/', mode: 'ro' }
-}
+c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+c.DockerSpawner.volumes[os.environ.get('MMT_VOLUME_HOST')] = {'bind' : '/content/', 'mode' : 'ro' }
+
 # c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
