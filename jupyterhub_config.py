@@ -11,7 +11,7 @@ class MathHubSpawner(DockerSpawner):
     def __init__(self, *args, **kwargs):
         super(MathHubSpawner, self).__init__(*args, **kwargs)
         self.env_keep += ['MMT_FRONTEND_BASE_URL', 'UPLOAD_REDIRECT_PREFIX']
-        self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE_MMT']
+        self.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 c.JupyterHub.spawner_class = MathHubSpawner
 
 # Command used to spawn jupyter hub inside of DockerSpawner

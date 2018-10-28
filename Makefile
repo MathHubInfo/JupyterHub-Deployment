@@ -21,14 +21,6 @@ secrets/postgres.env:
 	@echo "Generating postgres password in $@"
 	@echo "POSTGRES_PASSWORD=$(shell openssl rand -hex 32)" > $@
 
-secrets/jupyterhub.crt:
-	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
-	@exit 1
-
-secrets/jupyterhub.key:
-	@echo "Need an SSL key in secrets/jupyterhub.key"
-	@exit 1
-
 # Do not require cert/key files if SECRETS_VOLUME defined
 secrets_volume = $(shell echo $(SECRETS_VOLUME))
 ifeq ($(secrets_volume),)
@@ -39,9 +31,12 @@ endif
 
 check-files: $(cert_files) .config/postgres
 
+configure:
+	./configure
+
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
-	docker pull $(LOCAL_NOTEBOOK_IMAGE_MMT)
+	docker-compose pull
 
 build: check-files network volumes
 	docker build -t mathhub/jupyter .
