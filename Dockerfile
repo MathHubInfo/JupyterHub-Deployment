@@ -1,6 +1,6 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-ARG JUPYTERHUB_VERSION=0.8.0
+ARG JUPYTERHUB_VERSION=0.9.2
 FROM jupyterhub/jupyterhub:$JUPYTERHUB_VERSION
 
 # Install dockerspawner, tmpauthenticator, postgres
