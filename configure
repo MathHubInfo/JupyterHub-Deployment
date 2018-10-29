@@ -43,7 +43,7 @@ EOF
     read MMT_ARCHIVES
     if [ -z "$MMT_ARCHIVES" ]
     then
-        MMT_ARCHIVES="meta/inf MMT/urtheories MMT/LFX MitM/smglom MitM/MoSIS"
+        MMT_ARCHIVES="meta/inf MMT/LFX@devel MMT/urtheories@devel ODK/ODK@devel alignments/Public"
     fi;
       echo "Installing: $MMT_ARCHIVES"
 }
